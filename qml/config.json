@@ -1,0 +1,8 @@
+{
+    "title": "GopherWars",
+    "identifier": "com.yourcompany.wizardEVP.GopherWars",
+    "orientation": "landscape",
+    "versioncode": 1,
+    "versionname": "1.0",
+    "stage": "test"
+}
