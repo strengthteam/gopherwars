@@ -11,6 +11,7 @@ GameWindow {
     property int gridSizeGameSquared: gridSizeGame*gridSizeGame
     property var emptyCells
     property var tileItems: new Array(gridSizeGameSquared)
+    property var indix
 
     Rectangle {
         width: gameWindow.width
@@ -28,6 +29,7 @@ GameWindow {
         id: scene
         width: 480
         height: 320
+        property  int score: 0
 
         Component.onCompleted: {
             // fill the main array with empty spaces
@@ -38,7 +40,7 @@ GameWindow {
             updateEmptyCells()
 
             // create 2 random tiles
-            createNewTile()
+            //createNewTile()
             //createNewTile()
         }
 
@@ -60,23 +62,27 @@ GameWindow {
         }
         Timer {
             id: moveRelease
-            interval: 300
-        }
-
-        MouseArea {
-            id:mouseArea
-            anchors.fill: scene.gameWindowAnchorItem
-
-            onPressed: {
-
-                createNewTile()
-                moveRelease.start()
-            }
-            onReleased: {
+            interval: 1000
+            running: true
+            repeat: true
+            onTriggered: {
                 removeTile()
-                moveRelease.start()
+                updateEmptyCells()
+                createNewTile()
+
+
             }
         }
+
+        Text {
+
+             // this is your first property binding! *yay*
+           text: "Score " + scene.score
+
+           color: "red"
+           anchors.horizontalCenter: scene.gameWindowAnchorItem.horizontalCenter
+           anchors.top: scene.gameWindowAnchorItem.top
+         }
 
     }
 
@@ -90,6 +96,7 @@ GameWindow {
 
     function createNewTile() {
         var randomCellId = emptyCells[Math.floor(Math.random() * emptyCells.length)] // get random emptyCells
+        indix = randomCellId
         var tileId = entityManager.createEntityFromUrlWithProperties(Qt.resolvedUrl("Tile.qml"), {"tileIndex": randomCellId}) // create new Tile with a referenceID
         tileItems[randomCellId] = entityManager.getEntityById(tileId) // paste new Tile to the array
         emptyCells.splice(emptyCells.indexOf(randomCellId), 1) // remove the taken cell from emptyCell array
@@ -99,10 +106,12 @@ GameWindow {
 
         for(var i=0; i < gridSizeGameSquared; i++) {
 
-            if(tileItems[i] !== null)
-                entityManager.removeEntityById(tileItems[i])
+            if(tileItems[i] !== null) {
+                entityManager.removeEntityById(tileItems[i].entityId)
+                tileItems[i] = null
+            }
+
         }
 
     }
-
 }

@@ -32,19 +32,6 @@ Rectangle {
                         x: 0
                         y: 0
                     }
-//                    Rectangle {
-//                        anchors.centerIn: parent
-//                        width: parent.width-50
-//                        height: width
-
-////                        Image {
-////                            source: "../assets/gopher.png"
-////                            anchors.fill: parent
-////                            x: 0
-////                            y: 0
-////                        }
-//                    }
-
 
                 }
             }

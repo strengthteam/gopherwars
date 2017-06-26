@@ -26,6 +26,13 @@ EntityBase{
             x: 0
             y: 0
         }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                 scene.score++
+            }
+        }
     }
 
     // startup position calculation
@@ -33,5 +40,4 @@ EntityBase{
         x = (width) * (tileIndex % gridSizeGame) // we get the current row and multiply with the width to get the current position
         y = (height) * Math.floor(tileIndex / gridSizeGame) // we get the current column and multiply with the width to get the current position
     }
-    // move function
 }
