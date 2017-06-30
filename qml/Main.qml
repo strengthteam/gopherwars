@@ -2,116 +2,61 @@ import VPlay 2.0
 import QtQuick 2.0
 
 GameWindow {
-    id: gameWindow
+    id: window
     screenWidth: 960
     screenHeight: 640
 
-    property int gridWidth: 300
-    property int gridSizeGame: 3
-    property int gridSizeGameSquared: gridSizeGame*gridSizeGame
-    property var emptyCells
-    property var tileItems: new Array(gridSizeGameSquared)
-    property var indix
+    // You get free licenseKeys from https://v-play.net/licenseKey
+    // With a licenseKey you can:
+    //  * Publish your games & apps for the app stores
+    //  * Remove the V-Play Splash Screen or set a custom one (available with the Pro Licenses)
+    //  * Add plugins to monetize, analyze & improve your apps (available with the Pro Licenses)
+    //licenseKey: "<generate one from https://v-play.net/licenseKey>"
+    property alias window: window
 
-    Rectangle {
-        width: gameWindow.width
-        height: gameWindow.height
+    property int gridWidth: 270
+    property int gridRowSizeGame: 3
+    property int gridColumnSizeGame: 4
+    property int gridSizeGameSquared: gridRowSizeGame * gridColumnSizeGame
+    property var gopherItems: new Array(gridSizeGameSquared)
+
+    activeScene: splash
+
+    // show the splash and start the loading process as soon as the GameWindow is ready
+    Component.onCompleted: {
+        splash.opacity = 1
+        mainItemDelay.start()
     }
 
-
-    EntityManager {
-        id: entityManager
-        entityContainer: gameContainer
+    // since the splash has a fade in animation, we delay the loading of the game until the splash is fully displayed for sure
+    Timer {
+        id: mainItemDelay
+        interval: 500
+        onTriggered: {
+            mainItemLoader.source = "MainItem.qml"
+        }
     }
 
-
-    Scene {
-        id: scene
-        width: 480
-        height: 320
-        property  int score: 0
-
-        Component.onCompleted: {
-            // fill the main array with empty spaces
-            for(var i = 0; i < gridSizeGameSquared; i++)
-                tileItems[i] = null
-
-            // collect empty cells positions
-            updateEmptyCells()
-
-            // create 2 random tiles
-            //createNewTile()
-            //createNewTile()
-        }
-
-        Image {
-            source: "../assets/grassland.jpg"
-            anchors.fill: scene.gameWindowAnchorItem
-            x: 0
-            y: 0
-        }
-
-        Item {
-            id: gameContainer
-            width: gridWidth
-            height: gridWidth
-            anchors.centerIn: parent
-
-            GameBackground {}
-
-        }
-        Timer {
-            id: moveRelease
-            interval: 1000
-            running: true
-            repeat: true
-            onTriggered: {
-                removeTile()
-                updateEmptyCells()
-                createNewTile()
-
-
+    // as soon as we set the source property, the loader will load the game
+    Loader {
+        id: mainItemLoader
+        onLoaded: {
+            if (item) {
+                hideSplashDelay.start()
             }
         }
-
-        Text {
-
-             // this is your first property binding! *yay*
-           text: "Score " + scene.score
-
-           color: "red"
-           anchors.horizontalCenter: scene.gameWindowAnchorItem.horizontalCenter
-           anchors.top: scene.gameWindowAnchorItem.top
-         }
-
     }
 
-    function updateEmptyCells() {
-        emptyCells = []
-        for (var i = 0; i < gridSizeGameSquared; i++) {
-            if(tileItems[i] === null)
-                emptyCells.push(i)
+    // give the game a little time to fully display before hiding the splash, just to be sure it looks smooth also on low-end devices
+    Timer {
+        id: hideSplashDelay
+        interval: 200
+        onTriggered: {
+            splash.opacity = 0
         }
     }
 
-    function createNewTile() {
-        var randomCellId = emptyCells[Math.floor(Math.random() * emptyCells.length)] // get random emptyCells
-        indix = randomCellId
-        var tileId = entityManager.createEntityFromUrlWithProperties(Qt.resolvedUrl("Tile.qml"), {"tileIndex": randomCellId}) // create new Tile with a referenceID
-        tileItems[randomCellId] = entityManager.getEntityById(tileId) // paste new Tile to the array
-        emptyCells.splice(emptyCells.indexOf(randomCellId), 1) // remove the taken cell from emptyCell array
-    }
-
-    function removeTile() {
-
-        for(var i=0; i < gridSizeGameSquared; i++) {
-
-            if(tileItems[i] !== null) {
-                entityManager.removeEntityById(tileItems[i].entityId)
-                tileItems[i] = null
-            }
-
-        }
-
+    SplashScene {
+        id: splash
     }
 }
